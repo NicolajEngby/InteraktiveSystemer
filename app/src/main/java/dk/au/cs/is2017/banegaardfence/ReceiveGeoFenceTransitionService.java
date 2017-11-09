@@ -40,6 +40,7 @@ public class ReceiveGeoFenceTransitionService extends IntentService {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         Context context = getApplicationContext();
         String alert = (String) intent.getExtras().get("alertString");
+        String locationName = (String) intent.getExtras().get("locationName");
         if (event.hasError()) {
             // TODO: Handle error
         } else {
@@ -70,7 +71,7 @@ public class ReceiveGeoFenceTransitionService extends IntentService {
                 }
 
                 Notification notification = new NotificationCompat.Builder(this.getApplicationContext(), CHANNEL_ID)
-                        .setContentTitle("contentTitle")
+                        .setContentTitle(locationName)
                         .setContentText(alert)
                         .setTicker("ticker")
                         .setContentIntent(contentIntent)
