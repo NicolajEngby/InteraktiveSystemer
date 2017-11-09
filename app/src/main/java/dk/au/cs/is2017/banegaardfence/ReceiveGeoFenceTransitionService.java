@@ -38,7 +38,8 @@ public class ReceiveGeoFenceTransitionService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
-
+        Context context = getApplicationContext();
+        String alert = (String) intent.getExtras().get("alertString");
         if (event.hasError()) {
             // TODO: Handle error
         } else {
@@ -50,9 +51,7 @@ public class ReceiveGeoFenceTransitionService extends IntentService {
                 Log.d(MainActivity.TAG, getString(R.string.geofence_transition_notification_title, transitionType));
 
                 // Send a notification, when clicked, open website
-                String url = "https://www.rejseplanen.dk/webapp/index.html?language=en_EN&#!S|Aarhus%20H!Z|%C3%85bogade%2034%2C%208200%20Aarhus%20N%2C%20Aarhus%20Kommune!start|1";
-                Intent notificationIntent = new Intent(Intent.ACTION_VIEW);
-                notificationIntent.setData(Uri.parse(url));
+                Intent notificationIntent = new Intent(context, DistanceToTarget.class);
 
                 PendingIntent contentIntent = PendingIntent.getActivity(this.getApplicationContext(), 0, notificationIntent, 0);
 
@@ -71,9 +70,9 @@ public class ReceiveGeoFenceTransitionService extends IntentService {
                 }
 
                 Notification notification = new NotificationCompat.Builder(this.getApplicationContext(), CHANNEL_ID)
-                        .setContentTitle("Near Aarhus H!")
-                        .setContentText("Check out how to get to the Datalogi building!")
-                        .setTicker("You're near the Hovedbanegaard. Do you want to see how to get to the CS building?")
+                        .setContentTitle("contentTitle")
+                        .setContentText(alert)
+                        .setTicker("ticker")
                         .setContentIntent(contentIntent)
                         .setSmallIcon(R.drawable.stat_sys_gps_on)
                         .setAutoCancel(true)

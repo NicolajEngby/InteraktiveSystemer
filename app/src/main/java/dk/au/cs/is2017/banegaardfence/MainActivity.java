@@ -24,7 +24,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity
     implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    public static final String TAG = "BanegaardFence";
+    public static final String TAG = "IT2-g08";
     public static final int LOCATION_REQUEST_CODE = 1;
 
     private GoogleApiClient mGoogleApiClient;
@@ -60,7 +60,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(TAG, "Google Play Services connected!");
+        createGeoFence("this is an alert");
+    }
 
+    public void createGeoFence(String alert) {
         // Let's create a Geofence around the Hovedbanegård
         mBanegaardFence = new Geofence.Builder()
                 .setRequestId("hovedbanegaard")
@@ -74,9 +77,14 @@ public class MainActivity extends AppCompatActivity
                 .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
                 .build();
 
+        createAlert(alert);
+    }
+
+    public void createAlert(String alert) {
         // Create an Intent pointing to the IntentService
         Intent intent = new Intent(this,
                 ReceiveGeoFenceTransitionService.class);
+        intent.putExtra("alertString", alert);
         mPi = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
