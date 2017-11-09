@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BanegaardFence.iml" filepath="$PROJECT_DIR$/BanegaardFence.iml" />
+      <module fileurl="file://C:\Users\Nicol\AndroidStudioProjects\InteraktiveSystemer2\BanegaardFence.iml" filepath="C:\Users\Nicol\AndroidStudioProjects\InteraktiveSystemer2\BanegaardFence.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/InteraktiveSystemer2.iml" filepath="$PROJECT_DIR$/.idea/InteraktiveSystemer2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\Nicol\AndroidStudioProjects\InteraktiveSystemer2\app\app.iml" filepath="C:\Users\Nicol\AndroidStudioProjects\InteraktiveSystemer2\app\app.iml" />
     </modules>
   </component>
 </project>
