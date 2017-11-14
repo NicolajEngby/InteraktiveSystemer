@@ -46,8 +46,11 @@ public class MainActivity extends AppCompatActivity
     private Button addAlert;
     private EditText address;
     private EditText alertText;
+    private EditText radiusText;
     private Double lat = 0.0;
     private Double lon = 0.0;
+    private int radius = 1000;
+    private double[] array = fetchLocationName(address.getText().toString());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,8 @@ public class MainActivity extends AppCompatActivity
         addAlert = (Button)findViewById(R.id.addAlert);
         address   = (EditText)findViewById(R.id.address);
         alertText   = (EditText)findViewById(R.id.alert);
+        // Radius could also be Spinner? TODO:
+        radiusText = (EditText) findViewById(R.id.radiusText);
 
         addAlert.setOnClickListener(
                 new View.OnClickListener()
@@ -72,13 +77,17 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(View view)
                     {
                         //Fetch the lon and lat from the address and stores them in an array
-                        double[] array = fetchLocationName(address.getText().toString());
                         lat = array[0];
                         lon = array[1];
-                        System.out.println(array[0] + " :lat  +    lon: " + array[1]);
+                        radius = Integer.valueOf(radiusText.getText().toString());
+                        System.out.println(array[0] + " :lat  +  lon: " + array[1] + "  radius:  " + radius);
                         createAlert(alertText.getText().toString(), lat, lon);
                     }
                 });
+    }
+
+    public double[] returnArray(){
+        return array;
     }
 
     @Override
@@ -102,12 +111,12 @@ public class MainActivity extends AppCompatActivity
 
     public void createGeoFence(String alert) {
 
-        // Creates the Geofence around our lon and lat
+        // Creates the Geofence around our lon and lat with radius of 1500 meters
         mBanegaardFence = new Geofence.Builder()
                 .setRequestId(alertText.getText().toString())
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-                .setCircularRegion(lat, lon, 1500)
+                .setCircularRegion(lat, lon, radius)
                 .build();
         System.out.println(alertText.getText().toString());
 
@@ -173,6 +182,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     public double[] fetchLocationName(String locationName) {
+        // geoCoder object with a context argument
+        //context is used to access global application or activity information
         Geocoder geoCoder = new Geocoder(context, Locale.getDefault());
         double latitude = 0;
         double longitude = 0;
