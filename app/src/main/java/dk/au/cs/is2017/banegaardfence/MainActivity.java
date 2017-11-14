@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity
     private Button addAlert;
     private EditText address;
     private EditText alertText;
+    private Double lat = 0.0;
+    private Double lon = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,9 +71,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     public void onClick(View view)
                     {
+                        //Fetch the lon and lat from the address and stores them in an array
                         double[] array = fetchLocationName(address.getText().toString());
-                        double lat = array[0];
-                        double lon = array[1];
+                        lat = array[0];
+                        lon = array[1];
                         System.out.println(array[0] + " :lat  +    lon: " + array[1]);
                         createAlert(alertText.getText().toString(), lat, lon);
                     }
@@ -93,20 +96,20 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(TAG, "Google Play Services connected!");
+        //Call to our method, which builds GeoFences
         createGeoFence("this is an alert");
     }
 
     public void createGeoFence(String alert) {
-        double lat = 56.1503116;
-        double lon = 10.2047365;
 
-        // Let's create a Geofence around the Hovedbanegård
+        // Creates the Geofence around our lon and lat
         mBanegaardFence = new Geofence.Builder()
-                .setRequestId("hovedbanegaard")
+                .setRequestId(alertText.getText().toString())
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                 .setCircularRegion(lat, lon, 1500)
                 .build();
+        System.out.println(alertText.getText().toString());
 
         mRequest = new GeofencingRequest.Builder()
                 .addGeofence(mBanegaardFence)
