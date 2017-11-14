@@ -35,7 +35,7 @@ public class DistanceToTarget extends Activity {
 
         double distance = currentPosition.distanceTo(target);
         distanceToTarget.setText(String.valueOf(distance));
-
+*/
 
     }
 
