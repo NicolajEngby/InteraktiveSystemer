@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/InteraktiveSystemer1.iml" filepath="$PROJECT_DIR$/.idea/InteraktiveSystemer1.iml" />
-      <module fileurl="file://C:\Users\Nicol\AndroidStudioProjects\InteraktiveSystemer1\InteraktiveSystemerDenRigtige.iml" filepath="C:\Users\Nicol\AndroidStudioProjects\InteraktiveSystemer1\InteraktiveSystemerDenRigtige.iml" />
+      <module fileurl="file://$PROJECT_DIR$/InteraktiveSystemerDenRigtige.iml" filepath="$PROJECT_DIR$/InteraktiveSystemerDenRigtige.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\Frederik\AndroidStudioProjects\InteraktiveSystemerDenRigtige\app\app.iml" filepath="C:\Users\Frederik\AndroidStudioProjects\InteraktiveSystemerDenRigtige\app\app.iml" />
     </modules>
   </component>
 </project>
