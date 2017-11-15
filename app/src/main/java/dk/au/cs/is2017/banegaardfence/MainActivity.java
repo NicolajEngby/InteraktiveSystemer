@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
     private Double lat = 0.0;
     private Double lon = 0.0;
     private int radius = 1000;
-    private double[] array = fetchLocationName(address.getText().toString());
+    private double[] array;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity
                     public void onClick(View view)
                     {
                         //Fetch the lon and lat from the address and stores them in an array
+                        array = fetchLocationName(address.getText().toString());
                         lat = array[0];
                         lon = array[1];
                         radius = Integer.valueOf(radiusText.getText().toString());
