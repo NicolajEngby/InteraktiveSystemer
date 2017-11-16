@@ -23,12 +23,15 @@ import android.support.v4.app.ActivityCompat;
 import android.content.pm.PackageManager;
 import android.Manifest;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,7 +42,7 @@ public class MainActivity extends AppCompatActivity
     public static final int LOCATION_REQUEST_CODE = 1;
 
     private GoogleApiClient mGoogleApiClient;
-    private Geofence mBanegaardFence;
+    private ArrayList<Geofence> fences;
     private GeofencingRequest mRequest;
     private PendingIntent mPi;
     private Context context;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     public static Double lon = 0.0;
     private int radius = 1000;
     private double[] array;
+    private ArrayList<String> alerts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,10 @@ public class MainActivity extends AppCompatActivity
         // Radius could also be Spinner? TODO:
         radiusText = (EditText) findViewById(R.id.radiusText);
 
+        alerts = new ArrayList<>();
+        fences = new ArrayList<>();
+        populateListView();
+
         addAlert.setOnClickListener(
                 new View.OnClickListener()
                 {
@@ -83,8 +91,19 @@ public class MainActivity extends AppCompatActivity
                         radius = Integer.valueOf(radiusText.getText().toString());
                         System.out.println(array[0] + " :lat  +  lon: " + array[1] + "  radius:  " + radius);
                         createAlert(alertText.getText().toString(), lat, lon);
+                        if (!alerts.contains(address.getText().toString())) {
+                            alerts.add(address.getText().toString());
+                        }
                     }
                 });
+
+    }
+
+    //Supporting method to populate ListView with history of converts
+    private void populateListView() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.textview, alerts);
+        ListView list = (ListView) findViewById(R.id.listView);
+        list.setAdapter(adapter);
     }
 
     public void createDistanceIntent(double lat, double lon){
@@ -111,22 +130,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void createGeoFence(String alert) {
-
-        // Creates the Geofence around our lon and lat with radius of 1500 meters
-        mBanegaardFence = new Geofence.Builder()
+        fences.add(new Geofence.Builder()
                 .setRequestId(alertText.getText().toString())
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                 .setCircularRegion(lat, lon, radius)
-                .build();
-        System.out.println(alertText.getText().toString());
 
-        mRequest = new GeofencingRequest.Builder()
-                .addGeofence(mBanegaardFence)
-                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                .build();
+                .build()
+        );
+
+        mRequest = getGeofencingRequest();
 
         createAlert(alert, lat, lon);
+    }
+
+    private GeofencingRequest getGeofencingRequest() {
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofences(fences);
+        return builder.build();
     }
 
     public void createAlert(String alert, double lat, double lon) {
