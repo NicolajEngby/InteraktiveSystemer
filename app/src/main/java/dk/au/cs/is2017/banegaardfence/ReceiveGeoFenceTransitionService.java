@@ -52,7 +52,10 @@ public class ReceiveGeoFenceTransitionService extends IntentService {
                 Log.d(MainActivity.TAG, getString(R.string.geofence_transition_notification_title, transitionType));
 
                 // Send a notification, when clicked, open website
-                Intent notificationIntent = new Intent(context, DistanceToTarget.class);
+                Intent notificationIntent = new Intent(this, DistanceToTarget.class);
+                notificationIntent.putExtra("lon", MainActivity.lon);
+                notificationIntent.putExtra("lat", MainActivity.lat);
+                System.out.println(notificationIntent + "send");
 
                 PendingIntent contentIntent = PendingIntent.getActivity(this.getApplicationContext(), 0, notificationIntent, 0);
 

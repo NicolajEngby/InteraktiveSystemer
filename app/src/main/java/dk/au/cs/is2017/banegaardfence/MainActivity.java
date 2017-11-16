@@ -47,8 +47,8 @@ public class MainActivity extends AppCompatActivity
     private EditText address;
     private EditText alertText;
     private EditText radiusText;
-    private Double lat = 0.0;
-    private Double lon = 0.0;
+    public static Double lat = 0.0;
+    public static Double lon = 0.0;
     private int radius = 1000;
     private double[] array;
 
@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    public double[] returnArray(){
-        return array;
+    public void createDistanceIntent(double lat, double lon){
+
     }
 
     @Override
@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity
                             Manifest.permission.ACCESS_COARSE_LOCATION},
                     LOCATION_REQUEST_CODE);
         }
+
     }
 
     @Override
