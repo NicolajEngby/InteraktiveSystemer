@@ -39,8 +39,11 @@ public class ReceiveGeoFenceTransitionService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         Context context = getApplicationContext();
+        String longi = (String) intent.getStringExtra("lon");
+        String lati = (String) intent.getStringExtra("lat");
         String alert = (String) intent.getExtras().get("alertString");
         String locationName = (String) intent.getExtras().get("locationName");
+
         if (event.hasError()) {
             // TODO: Handle error
         } else {
@@ -51,11 +54,14 @@ public class ReceiveGeoFenceTransitionService extends IntentService {
 
                 Log.d(MainActivity.TAG, getString(R.string.geofence_transition_notification_title, transitionType));
 
+
+                System.out.println(longi + ":::" + lati);
                 // Send a notification, when clicked, open website
                 Intent notificationIntent = new Intent(this, DistanceToTarget.class);
-                System.out.println(notificationIntent + "send");
+                notificationIntent.putExtra("lat", lati);
+                notificationIntent.putExtra("lon", longi);
 
-                PendingIntent contentIntent = PendingIntent.getActivity(this.getApplicationContext(), 0, notificationIntent, 0);
+                PendingIntent contentIntent = PendingIntent.getActivity(this.getApplicationContext(), 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 // Create a notification channel if on API 26 (Android O) and above
                 NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -87,10 +93,17 @@ public class ReceiveGeoFenceTransitionService extends IntentService {
                 manager.notify(1, notification);
 
                 Log.d(MainActivity.TAG, "Notified!");
+
             } else {
                 // TODO: Handle invalid transition
             }
         }
+    }
+    public void sendLocation(String lon, String lat){
+        Intent intent = new Intent(this, DistanceToTarget.class);
+        intent.putExtra("lat", lat);
+        intent.putExtra("lon", lon);
+        startActivity(intent);
     }
 
     /**

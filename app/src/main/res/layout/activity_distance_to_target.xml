@@ -6,4 +6,11 @@
     android:layout_height="match_parent"
     tools:context="dk.au.cs.is2017.banegaardfence.DistanceToTarget">
 
+    <TextView
+        android:id="@+id/distanceToTgt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/textview"
+        tools:layout_editor_absoluteX="119dp"
+        tools:layout_editor_absoluteY="86dp" />
 </android.support.constraint.ConstraintLayout>

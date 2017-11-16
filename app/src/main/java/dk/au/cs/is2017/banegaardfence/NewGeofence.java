@@ -55,8 +55,8 @@ public class NewGeofence extends AppCompatActivity
     private EditText address;
     private EditText alertText;
     private EditText radiusText;
-    private Double lat = 0.0;
-    private Double lon = 0.0;
+    public static Double lat = 0.0;
+    public static Double lon = 0.0;
     private int radius = 1000;
     private double[] array;
 
@@ -96,6 +96,7 @@ public class NewGeofence extends AppCompatActivity
                 lon = array[1];
                 radius = Integer.valueOf(radiusText.getText().toString());
                 System.out.println(array[0] + " :lat  +  lon: " + array[1] + "  radius:  " + radius);
+                System.out.println(alertText.getText().toString());
                 createAlert(alertText.getText().toString(), lat, lon);
                 geofenceObjects.add(new GeofenceObjects(address.getText().toString(), alertText.getText().toString()));
                 saveToStorage();
@@ -103,6 +104,13 @@ public class NewGeofence extends AppCompatActivity
             }
         });
     }
+
+    /*public void sendLocation(){
+        Intent intent = new Intent(this, DistanceToTarget.class);
+        intent.putExtra("lat", lat.toString());
+        intent.putExtra("lon", lon.toString());
+        startActivity(intent);
+    }*/
 
     public void readEarlierGeofences() {
         ArrayList<GeofenceObjects> returnlist = new ArrayList<>();
@@ -183,6 +191,8 @@ public class NewGeofence extends AppCompatActivity
         // Create an Intent pointing to the IntentService
         Intent intent = new Intent(this,
                 ReceiveGeoFenceTransitionService.class);
+        intent.putExtra("lon", String.valueOf(lon));
+        intent.putExtra("lat", String.valueOf(lat));
         intent.putExtra("alertString", alert);
         intent.putExtra("locationName", alertText.getText().toString());
         mPi = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
