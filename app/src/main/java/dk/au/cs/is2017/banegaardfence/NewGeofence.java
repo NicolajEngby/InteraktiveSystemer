@@ -59,6 +59,8 @@ public class NewGeofence extends AppCompatActivity
     private Double lon = 0.0;
     private int radius = 1000;
     private double[] array;
+
+    private ArrayList<String> alertMessages;
     private ArrayList<String> alerts;
 
     @Override
@@ -81,9 +83,11 @@ public class NewGeofence extends AppCompatActivity
         radiusText = (EditText) findViewById(R.id.radiusText);
 
         alerts = new ArrayList<>();
+        alertMessages = new ArrayList<>();
         fences = new ArrayList<>();
 
         readEarlierGeofences();
+        readEarlierAlerts();
 
 
         addAlert.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +102,7 @@ public class NewGeofence extends AppCompatActivity
                 createAlert(alertText.getText().toString(), lat, lon);
                 if (!alerts.contains(address.getText().toString())) {
                     alerts.add(address.getText().toString());
+                    alertMessages.add(alertText.getText().toString());
                     saveToStorage();
                 }
             }
@@ -117,6 +122,19 @@ public class NewGeofence extends AppCompatActivity
         alerts.addAll(returnlist);
     }
 
+    public void readEarlierAlerts() {
+        ArrayList<String> returnlist = new ArrayList<>();
+        try {
+            FileInputStream fis = openFileInput("Alerts");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            returnlist = (ArrayList<String>) ois.readObject();
+            ois.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        alertMessages.addAll(returnlist);
+    }
+
     private void saveToStorage() {
         FileOutputStream fos = null;
         try {
@@ -124,6 +142,17 @@ public class NewGeofence extends AppCompatActivity
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(alerts);
             oos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        FileOutputStream fos2 = null;
+        try {
+            fos2 = context.openFileOutput("Alerts", Context.MODE_PRIVATE);
+            ObjectOutputStream oos2 = new ObjectOutputStream(fos2);
+            oos2.writeObject(alertMessages);
+            oos2.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

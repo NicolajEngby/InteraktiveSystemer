@@ -7,16 +7,36 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private Context context;
     private FloatingActionButton fab;
+    private ListView listView;
+    private TextView address;
+    private EditText newAlert;
+    private TextView currentAlert;
+    private Button save;
+    private Button delete;
+    private int currentGeofence;
+    private ArrayList<String> geofences;
+    private ArrayList<String> alerts;
     public static final String TAG = "IT2-g08";
     public static final int LOCATION_REQUEST_CODE = 1;
 
@@ -25,7 +45,39 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
+        listView = findViewById(R.id.listView);
+        address = findViewById(R.id.address);
+        newAlert = findViewById(R.id.newAlert);
+        currentAlert = findViewById(R.id.currentAlert);
+        save = findViewById(R.id.saveNewAlert);
+        delete = findViewById(R.id.deleteGeoFence);
         populateListView();
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String item = (String) adapterView.getItemAtPosition(i);
+                address.setText(item);
+                currentGeofence = i;
+                if(alerts.isEmpty()) return;
+                currentAlert.setText(alerts.get(i));
+            }
+        });
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                geofences.remove(currentGeofence);
+                updateListView();
+            }
+        });
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentAlert.setText(newAlert.getText().toString());
+            }
+        });
     }
 
     private void populateListView() {
@@ -42,7 +94,14 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        geofences = returnlist;
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.textview, returnlist);
+        ListView list = (ListView) findViewById(R.id.listView);
+        list.setAdapter(adapter);
+    }
+
+    private void updateListView() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.textview, geofences);
         ListView list = (ListView) findViewById(R.id.listView);
         list.setAdapter(adapter);
     }
@@ -65,6 +124,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveToStorage();
+    }
+
+    private void saveToStorage() {
+        FileOutputStream fos = null;
+        try {
+            fos = context.openFileOutput("GeoFences", Context.MODE_PRIVATE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(geofences);
+            oos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
