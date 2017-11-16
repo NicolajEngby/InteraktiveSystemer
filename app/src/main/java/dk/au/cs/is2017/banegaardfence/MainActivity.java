@@ -34,78 +34,143 @@ public class MainActivity extends AppCompatActivity {
     private TextView currentAlert;
     private Button save;
     private Button delete;
-    private int currentGeofence;
+
+    private GeofenceObjects currentObject;
+
     private ArrayList<String> geofences;
     private ArrayList<String> alerts;
     public static final String TAG = "IT2-g08";
     public static final int LOCATION_REQUEST_CODE = 1;
+    private ArrayList<GeofenceObjects> currentList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
+
+        //find stuff
         listView = findViewById(R.id.listView);
         address = findViewById(R.id.address);
         newAlert = findViewById(R.id.newAlert);
         currentAlert = findViewById(R.id.currentAlert);
         save = findViewById(R.id.saveNewAlert);
         delete = findViewById(R.id.deleteGeoFence);
-        populateListView();
+        newAlert.setVisibility(View.GONE);
+        save.setVisibility(View.GONE);
+        delete.setVisibility(View.GONE);
 
+
+        //initialize array to hold addresses of geofences
+        geofences = new ArrayList<>();
+
+        //listener for listview
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String item = (String) adapterView.getItemAtPosition(i);
+
+                //sets chosen address in textview
                 address.setText(item);
-                currentGeofence = i;
-                if(alerts.isEmpty()) return;
-                currentAlert.setText(alerts.get(i));
+
+                //loops through list of geofences (objects with addresses and alerts)
+                //sets currentObject so we know which object we are deleting/updating
+                for (GeofenceObjects geofenceObjects : currentList) {
+                    if (item == geofenceObjects.getGeofenceName()) {
+                        currentObject = geofenceObjects;
+                    }
+                }
+
+                //displays current alert for currentObject
+                currentAlert.setText(currentObject.getAlert());
+
+                //shows field to edit alert
+                newAlert.setVisibility(View.VISIBLE);
+                save.setVisibility(View.VISIBLE);
+                delete.setVisibility(View.VISIBLE);
             }
         });
 
+        //listener for deletebutton
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                geofences.remove(currentGeofence);
+                if (currentObject == null) return;
+                //removes currentObject from currentList (list fetched from internal storage)
+                //clears list with addresses
+                currentList.remove(currentObject);
+                geofences.clear();
+                //updates list with addresses
+                for (GeofenceObjects geofenceObjects : currentList) {
+                    geofences.add(geofenceObjects.getGeofenceName());
+                }
+
+                //clears fields
+                currentAlert.setText("");
+                address.setText("");
+
+                //updates listview
                 updateListView();
+
+                newAlert.setVisibility(View.GONE);
+                save.setVisibility(View.GONE);
+                delete.setVisibility(View.GONE);
+
             }
         });
 
+        //listener for saveButton
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (currentObject == null) return;
+                //sets new alert for currentObject and field
+                currentObject.setAlert(newAlert.getText().toString());
                 currentAlert.setText(newAlert.getText().toString());
+
+                newAlert.setVisibility(View.GONE);
             }
         });
     }
 
-    private void populateListView() {
+    //fetches arraylist with GeofenceObjects from internal storage
+    //saved in currentList which is used in other methods
+    private void readFromInternalStorage() {
+        ArrayList<GeofenceObjects> returnlist = new ArrayList<>();
         if (!isExternalStorageReadable()) {
             System.out.println("not readable");
-            return;
+        } else {
+            returnlist = new ArrayList<>();
+            try {
+                FileInputStream fis = openFileInput("GeoFences");
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                returnlist = (ArrayList<GeofenceObjects>) ois.readObject();
+                ois.close();
+                System.out.println(returnlist);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        ArrayList<String> returnlist = new ArrayList<>();
-        try {
-            FileInputStream fis = openFileInput("GeoFences");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            returnlist = (ArrayList<String>) ois.readObject();
-            ois.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        geofences = returnlist;
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.textview, returnlist);
-        ListView list = (ListView) findViewById(R.id.listView);
-        list.setAdapter(adapter);
+        currentList = returnlist;
     }
 
+    //adds addresses from GeofenceObjects to gefences-list
+    private void populateGeofencesList() {
+        ArrayList<GeofenceObjects> returnlist = currentList;
+        geofences.clear();
+        for (GeofenceObjects geofenceObjects : returnlist) {
+            geofences.add(geofenceObjects.getGeofenceName());
+        }
+    }
+
+    //updates listview with addresses from geofence-list
     private void updateListView() {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.textview, geofences);
         ListView list = (ListView) findViewById(R.id.listView);
         list.setAdapter(adapter);
     }
 
+    //checks if storage is readable
     public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state) ||
@@ -132,15 +197,14 @@ public class MainActivity extends AppCompatActivity {
         saveToStorage();
     }
 
+    //saves currentList to storage
     private void saveToStorage() {
         FileOutputStream fos = null;
         try {
             fos = context.openFileOutput("GeoFences", Context.MODE_PRIVATE);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(geofences);
+            oos.writeObject(currentList);
             oos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -149,7 +213,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        populateListView();
+        readFromInternalStorage();
+        populateGeofencesList();
+        updateListView();
+        System.out.println("**********");
+        System.out.println(currentList);
     }
 
     public void buttonClicked(View view) {

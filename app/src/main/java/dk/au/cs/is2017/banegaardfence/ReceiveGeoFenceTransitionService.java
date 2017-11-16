@@ -96,7 +96,7 @@ public class ReceiveGeoFenceTransitionService extends IntentService {
     /**
      * Maps geofence transition types to their human-readable equivalents.
      *
-     * @param transitionType A transition type constant defined in Geofence
+     * @param transitionType A transition type constant defined in GeofenceObjects
      * @return A String indicating the type of transition
      */
     private String getTransitionString(int transitionType) {

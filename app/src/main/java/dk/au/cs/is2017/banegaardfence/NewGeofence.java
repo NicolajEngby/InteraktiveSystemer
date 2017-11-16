@@ -60,8 +60,7 @@ public class NewGeofence extends AppCompatActivity
     private int radius = 1000;
     private double[] array;
 
-    private ArrayList<String> alertMessages;
-    private ArrayList<String> alerts;
+    private ArrayList<GeofenceObjects> geofenceObjects;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,12 +81,10 @@ public class NewGeofence extends AppCompatActivity
         // Radius could also be Spinner? TODO:
         radiusText = (EditText) findViewById(R.id.radiusText);
 
-        alerts = new ArrayList<>();
-        alertMessages = new ArrayList<>();
         fences = new ArrayList<>();
+        geofenceObjects = new ArrayList<>();
 
         readEarlierGeofences();
-        readEarlierAlerts();
 
 
         addAlert.setOnClickListener(new View.OnClickListener() {
@@ -100,39 +97,24 @@ public class NewGeofence extends AppCompatActivity
                 radius = Integer.valueOf(radiusText.getText().toString());
                 System.out.println(array[0] + " :lat  +  lon: " + array[1] + "  radius:  " + radius);
                 createAlert(alertText.getText().toString(), lat, lon);
-                if (!alerts.contains(address.getText().toString())) {
-                    alerts.add(address.getText().toString());
-                    alertMessages.add(alertText.getText().toString());
-                    saveToStorage();
-                }
+                geofenceObjects.add(new GeofenceObjects(address.getText().toString(), alertText.getText().toString()));
+                saveToStorage();
+                finish();
             }
         });
     }
 
     public void readEarlierGeofences() {
-        ArrayList<String> returnlist = new ArrayList<>();
+        ArrayList<GeofenceObjects> returnlist = new ArrayList<>();
         try {
             FileInputStream fis = openFileInput("GeoFences");
             ObjectInputStream ois = new ObjectInputStream(fis);
-            returnlist = (ArrayList<String>) ois.readObject();
+            returnlist = (ArrayList<GeofenceObjects>) ois.readObject();
             ois.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        alerts.addAll(returnlist);
-    }
-
-    public void readEarlierAlerts() {
-        ArrayList<String> returnlist = new ArrayList<>();
-        try {
-            FileInputStream fis = openFileInput("Alerts");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            returnlist = (ArrayList<String>) ois.readObject();
-            ois.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        alertMessages.addAll(returnlist);
+        geofenceObjects.addAll(returnlist);
     }
 
     private void saveToStorage() {
@@ -140,21 +122,8 @@ public class NewGeofence extends AppCompatActivity
         try {
             fos = context.openFileOutput("GeoFences", Context.MODE_PRIVATE);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(alerts);
+            oos.writeObject(geofenceObjects);
             oos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        FileOutputStream fos2 = null;
-        try {
-            fos2 = context.openFileOutput("Alerts", Context.MODE_PRIVATE);
-            ObjectOutputStream oos2 = new ObjectOutputStream(fos2);
-            oos2.writeObject(alertMessages);
-            oos2.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -174,6 +143,13 @@ public class NewGeofence extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        geofenceObjects = new ArrayList<>();
+        readEarlierGeofences();
     }
 
     @Override
@@ -234,7 +210,7 @@ public class NewGeofence extends AppCompatActivity
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    String message = "Location permission accepted. Geofence will be created.";
+                    String message = "Location permission accepted. GeofenceObjects will be created.";
                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
 
                     // OK, request it now
@@ -245,7 +221,7 @@ public class NewGeofence extends AppCompatActivity
 
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    String message = "Location permission denied. Geofence will not work.";
+                    String message = "Location permission denied. GeofenceObjects will not work.";
                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                 }
                 return;
