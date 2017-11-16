@@ -3,6 +3,7 @@
     package="dk.au.cs.is2017.banegaardfence">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -15,22 +16,22 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".MainActivity">
+        <service
+            android:name=".ReceiveGeoFenceTransitionService"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".ReceiveGeoFenceTransitionService"
-            android:exported="false" />
-
-        <activity
-            android:name=".DistanceToTarget"
-            android:label="@string/title_activity_distance_to_target"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".NewGeofence" />
+        <activity android:name=".DistanceToTarget"></activity>
     </application>
 
 </manifest>

@@ -20,8 +20,7 @@ public class DistanceToTarget extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_distance_to_target);
 
-        distanceToTarget = (TextView) findViewById(R.id.distanceToTgt);
-        double array[] = mainActivity.returnArray();
+        //distanceToTarget = (TextView) findViewById(R.id.distanceToTgt);
 
         // missing getting the old location and the target location as Lon and Lat
         /* Location currentPosition = new Location("Current Position");
