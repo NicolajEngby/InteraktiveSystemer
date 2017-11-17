@@ -15,21 +15,27 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallback {
+public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener,
+        GoogleMap.OnMarkerClickListener{
 
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
     private ArrayList<GeofenceObjects> currentList;
     private Context context;
+    Marker lastClicked = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,13 +45,10 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
         currentList = new ArrayList<>();
         readFromInternalStorage();
 
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
     }
 
     public double[] fetchLocationName(String locationName) {
@@ -71,7 +74,7 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latlon[0], latlon[1]))
                     .title(geofenceObjects.getGeofenceName())
-                    .snippet("Radius: " + radius + "m"));
+                    .snippet(geofenceObjects.getAlert()));
             //Instantiates a new CircleOptions object +  center/radius
             CircleOptions circleOptions = new CircleOptions()
                     .center(new LatLng(latlon[0], latlon[1]))
@@ -117,7 +120,60 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapLongClickListener(this);
+        googleMap.setOnMarkerClickListener(this);
         addMarkerForFence();
-        mMap.moveCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(xxxx,xxxx) , 14.0f) );
+        GeofenceObjects object = currentList.get(0);
+        double[] latlon = fetchLocationName(object.getGeofenceName());
+        mMap.moveCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(latlon[0],latlon[1]) , 14.0f) );
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        String alert = "Create an alert on the homescreen";
+        String name = "Name";
+        int radius = 1000;
+        currentList.add(new GeofenceObjects(name, alert, radius));
+        mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title(name)
+                .snippet(alert));
+        //Instantiates a new CircleOptions object +  center/radius
+        CircleOptions circleOptions = new CircleOptions()
+                .center(latLng)
+                .radius(radius)
+                .fillColor(0x40ff0000)
+                .strokeColor(Color.TRANSPARENT)
+                .strokeWidth(2);
+        // Get back the mutable Circle
+        Circle circle = mMap.addCircle(circleOptions);
+    }
+
+    private void saveToStorage() {
+        FileOutputStream fos = null;
+        try {
+            fos = context.openFileOutput("GeoFences", Context.MODE_PRIVATE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(currentList);
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onStop() {
+        super.onStop();
+        saveToStorage();
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if (lastClicked!=null) {
+            lastClicked.setSnippet("HEY");
+        } else {
+            marker.setSnippet("HEY");
+            lastClicked = marker;
+        }
+        return true;
     }
 }
