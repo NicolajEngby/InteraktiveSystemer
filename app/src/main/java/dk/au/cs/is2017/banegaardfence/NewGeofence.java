@@ -149,7 +149,6 @@ public class NewGeofence extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
-        System.out.println("google connected****************'");
     }
 
     @Override
