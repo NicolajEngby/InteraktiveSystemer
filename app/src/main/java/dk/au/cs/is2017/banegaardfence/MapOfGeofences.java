@@ -130,7 +130,7 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
     @Override
     public void onMapLongClick(LatLng latLng) {
         String alert = "Create an alert on the homescreen";
-        String name = "Name";
+        String name = addressFromLatLon(latLng.latitude, latLng.longitude);
         int radius = 1000;
         currentList.add(new GeofenceObjects(name, alert, radius));
         saveToStorage();
@@ -162,7 +162,20 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
         }
     }
 
+    public String addressFromLatLon(double lat, double lon) {
+        Geocoder geocoder;
+        List<Address> addresses = new ArrayList<>();
+        geocoder = new Geocoder(this, Locale.getDefault());
 
+        try {
+            addresses = geocoder.getFromLocation(lat, lon, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String address = addresses.get(0).getAddressLine(0);
+        return address;
+    }
 
     public void onResume() {
         super.onResume();
