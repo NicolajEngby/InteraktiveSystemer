@@ -98,7 +98,7 @@ public class NewGeofence extends AppCompatActivity
                 System.out.println(array[0] + " :lat  +  lon: " + array[1] + "  radius:  " + radius);
                 System.out.println(alertText.getText().toString());
                 createAlert(alertText.getText().toString(), lat, lon);
-                geofenceObjects.add(new GeofenceObjects(address.getText().toString(), alertText.getText().toString()));
+                geofenceObjects.add(new GeofenceObjects(address.getText().toString(), alertText.getText().toString(), radius));
                 saveToStorage();
                 finish();
             }

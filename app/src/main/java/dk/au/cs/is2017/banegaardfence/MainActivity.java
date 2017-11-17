@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView currentAlert;
     private Button save;
     private Button delete;
+    private Button showMap;
 
     private GeofenceObjects currentObject;
 
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         currentAlert = findViewById(R.id.currentAlert);
         save = findViewById(R.id.saveNewAlert);
         delete = findViewById(R.id.deleteGeoFence);
+        showMap = findViewById(R.id.showMap);
         newAlert.setVisibility(View.GONE);
         save.setVisibility(View.GONE);
         delete.setVisibility(View.GONE);
@@ -129,6 +131,13 @@ public class MainActivity extends AppCompatActivity {
                 currentAlert.setText(newAlert.getText().toString());
 
                 newAlert.setVisibility(View.GONE);
+            }
+        });
+
+        showMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, MapOfGeofences.class));
             }
         });
     }

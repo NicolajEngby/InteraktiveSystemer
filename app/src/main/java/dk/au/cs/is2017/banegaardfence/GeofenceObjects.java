@@ -9,10 +9,12 @@ import java.io.Serializable;
 public class GeofenceObjects implements Serializable {
     private String geofenceName;
     private String alert;
+    private int radius;
 
-    public GeofenceObjects(String geofenceName, String alert) {
+    public GeofenceObjects(String geofenceName, String alert, int radius) {
         this.geofenceName = geofenceName;
         this.alert = alert;
+        this.radius = radius;
     }
 
     public String getGeofenceName() {
@@ -25,5 +27,13 @@ public class GeofenceObjects implements Serializable {
 
     public void setAlert(String newAlert) {
         alert = newAlert;
+    }
+
+    public int getRadius() {
+        return radius;
+    }
+
+    public void setRadius(int radius) {
+        this.radius = radius;
     }
 }

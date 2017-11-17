@@ -1,5 +1,9 @@
 package dk.au.cs.is2017.banegaardfence;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -8,25 +12,33 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
     private ArrayList<GeofenceObjects> currentList;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_of_geofences);
+        context = getApplicationContext();
         currentList = new ArrayList<>();
         readFromInternalStorage();
+        addMarkerForFence();
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -37,31 +49,46 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
 
     }
 
-    public void addMarkerForFence(){
-        for (GeofenceObjects geofenceObjects : currentList) {
-
-            double lat =
-            mMap.addMarker( new MarkerOptions()
-                    .position( new LatLng() )
-                    .title("Fence " + fence.getId())
-                    .snippet("Radius: " + fence.getRadius()) ).showInfoWindow();
+    public double[] fetchLocationName(String locationName) {
+        // geoCoder object with a context argument
+        //context is used to access global application or activity information
+        Geocoder geoCoder = new Geocoder(context, Locale.getDefault());
+        double latitude = 0;
+        double longitude = 0;
+        try {
+            List<Address> address = geoCoder.getFromLocationName(locationName, 1);
+            latitude = address.get(0).getLatitude();
+            longitude = address.get(0).getLongitude();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-
-
-//Instantiates a new CircleOptions object +  center/radius
-        CircleOptions circleOptions = new CircleOptions()
-                .center( new LatLng(fence.getLatitude(), fence.getLongitude()) )
-                .radius( fence.getRadius() )
-                .fillColor(0x40ff0000)
-                .strokeColor(Color.TRANSPARENT)
-                .strokeWidth(2);
-
-// Get back the mutable Circle
-        Circle circle = mMap.addCircle(circleOptions);
-// more operations on the circle...
-
+        return new double[] {latitude, longitude};
     }
+
+    public void addMarkerForFence() {
+        for (GeofenceObjects geofenceObjects : currentList) {
+            double[] latlon = fetchLocationName(geofenceObjects.getGeofenceName());
+            int radius = geofenceObjects.getRadius();
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(latlon[0], latlon[1]))
+                    .title(geofenceObjects.getGeofenceName())
+                    .snippet("Radius: " + radius + "m")).showInfoWindow();
+            //Instantiates a new CircleOptions object +  center/radius
+            CircleOptions circleOptions = new CircleOptions()
+                    .center(new LatLng(latlon[0], latlon[1]))
+                    .radius(radius)
+                    .fillColor(0x40ff0000)
+                    .strokeColor(Color.TRANSPARENT)
+                    .strokeWidth(2);
+            // Get back the mutable Circle
+            Circle circle = mMap.addCircle(circleOptions);
+            // more operations on the circle available...
+        }
+    }
+
+
+
+
 
     private void readFromInternalStorage() {
         ArrayList<GeofenceObjects> returnlist = new ArrayList<>();
