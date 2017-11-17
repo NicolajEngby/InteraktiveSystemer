@@ -27,8 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener,
-        GoogleMap.OnMarkerClickListener{
+public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
@@ -69,6 +68,7 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
 
     public void addMarkerForFence() {
         for (GeofenceObjects geofenceObjects : currentList) {
+            System.out.println(currentList);
             double[] latlon = fetchLocationName(geofenceObjects.getGeofenceName());
             int radius = geofenceObjects.getRadius();
             mMap.addMarker(new MarkerOptions()
@@ -121,7 +121,6 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMapLongClickListener(this);
-        googleMap.setOnMarkerClickListener(this);
         addMarkerForFence();
         GeofenceObjects object = currentList.get(0);
         double[] latlon = fetchLocationName(object.getGeofenceName());
@@ -134,6 +133,7 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
         String name = "Name";
         int radius = 1000;
         currentList.add(new GeofenceObjects(name, alert, radius));
+        saveToStorage();
         mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title(name)
@@ -156,24 +156,16 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(currentList);
             oos.close();
+            System.out.println("SAVED");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void onStop() {
-        super.onStop();
-        saveToStorage();
-    }
 
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        if (lastClicked!=null) {
-            lastClicked.setSnippet("HEY");
-        } else {
-            marker.setSnippet("HEY");
-            lastClicked = marker;
-        }
-        return true;
+
+    public void onResume() {
+        super.onResume();
+        readFromInternalStorage();
     }
 }
