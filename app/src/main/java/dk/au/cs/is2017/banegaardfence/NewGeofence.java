@@ -90,7 +90,13 @@ public class NewGeofence extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 //Fetch the lon and lat from the address and stores them in an array
-                array = fetchLocationName(address.getText().toString());
+                try {
+                    array = fetchLocationName(address.getText().toString());
+                } catch (Exception e) {
+                    Toast toast = Toast.makeText(context, "Please provide a valid address", Toast.LENGTH_SHORT);
+                    toast.show();
+                    return;
+                }
                 lat = array[0];
                 lon = array[1];
                 radius = Integer.valueOf(radiusText.getText().toString());
@@ -229,19 +235,16 @@ public class NewGeofence extends AppCompatActivity
         }
     }
 
-    public double[] fetchLocationName(String locationName) {
+    public double[] fetchLocationName(String locationName) throws Exception {
         // geoCoder object with a context argument
         //context is used to access global application or activity information
         Geocoder geoCoder = new Geocoder(context, Locale.getDefault());
         double latitude = 0;
         double longitude = 0;
-        try {
-            List<Address> address = geoCoder.getFromLocationName(locationName, 1);
-            latitude = address.get(0).getLatitude();
-            longitude = address.get(0).getLongitude();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<Address> address = geoCoder.getFromLocationName(locationName, 1);
+        if (address.isEmpty()) throw new Exception("Address is wrong");
+        latitude = address.get(0).getLatitude();
+        longitude = address.get(0).getLongitude();
         return new double[] {latitude, longitude};
     }
 
