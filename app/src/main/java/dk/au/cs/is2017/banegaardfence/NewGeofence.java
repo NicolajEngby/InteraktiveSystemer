@@ -78,7 +78,6 @@ public class NewGeofence extends AppCompatActivity
         addAlert = (Button)findViewById(R.id.addAlert);
         address   = (EditText)findViewById(R.id.address);
         alertText   = (EditText)findViewById(R.id.alert);
-        // Radius could also be Spinner? TODO:
         radiusText = (EditText) findViewById(R.id.radiusText);
 
         fences = new ArrayList<>();
@@ -105,13 +104,6 @@ public class NewGeofence extends AppCompatActivity
         });
     }
 
-    /*public void sendLocation(){
-        Intent intent = new Intent(this, DistanceToTarget.class);
-        intent.putExtra("lat", lat.toString());
-        intent.putExtra("lon", lon.toString());
-        startActivity(intent);
-    }*/
-
     public void readEarlierGeofences() {
         ArrayList<GeofenceObjects> returnlist = new ArrayList<>();
         try {
@@ -135,10 +127,6 @@ public class NewGeofence extends AppCompatActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public double[] returnArray(){
-        return array;
     }
 
     @Override
@@ -173,7 +161,6 @@ public class NewGeofence extends AppCompatActivity
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                 .setCircularRegion(lat, lon, radius)
-
                 .build()
         );
         mRequest = getGeofencingRequest();
