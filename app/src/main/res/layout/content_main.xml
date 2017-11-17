@@ -11,22 +11,20 @@
     <ListView
         android:id="@+id/listView"
         android:layout_width="350dp"
-        android:layout_height="129dp"
+        android:layout_height="144dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.538"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/header" />
 
     <TextView
         android:id="@+id/address"
         android:layout_width="0dp"
         android:layout_height="67dp"
-        android:layout_marginBottom="260dp"
+        android:layout_marginBottom="252dp"
         android:background="@color/colorPrimary"
         android:paddingTop="10dp"
         android:text="Choose a geofence"
@@ -50,18 +48,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/deleteGeoFence"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="56dp"
-        android:layout_marginEnd="84dp"
-        android:background="@color/colorPrimary"
-        android:text="Delete"
-        android:textColor="#ffffff"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <EditText
         android:id="@+id/newAlert"
         android:layout_width="wrap_content"
@@ -78,11 +64,41 @@
         app:layout_constraintTop_toBottomOf="@+id/currentAlert"
         app:layout_constraintVertical_bias="0.25" />
 
+
+
+    <TextView
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="34dp"
+        android:layout_marginTop="4dp"
+        android:text="Geofences:"
+        android:textAlignment="center"
+        android:textSize="20dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/deleteGeoFence"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="56dp"
+        android:layout_marginEnd="84dp"
+        android:background="#e92f2f"
+        android:text="Delete"
+        android:textColor="#ffffff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <TextView
         android:id="@+id/currentAlert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25dp"
+        android:layout_marginTop="20dp"
+        android:text=""
+        android:textSize="20dp"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/address" />
