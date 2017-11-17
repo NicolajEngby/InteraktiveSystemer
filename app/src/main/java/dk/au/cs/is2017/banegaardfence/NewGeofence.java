@@ -69,11 +69,7 @@ public class NewGeofence extends AppCompatActivity
         context = getApplicationContext();
 
         // Set up Google API
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+        setupGoogle();
 
         addAlert = (Button)findViewById(R.id.addAlert);
         address   = (EditText)findViewById(R.id.address);
@@ -90,24 +86,38 @@ public class NewGeofence extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 //Fetch the lon and lat from the address and stores them in an array
-                try {
-                    array = fetchLocationName(address.getText().toString());
-                } catch (Exception e) {
+                array = fetchLocationName(address.getText().toString());
+                if (array[0] == 0 && array[1] == 0) {
                     Toast toast = Toast.makeText(context, "Please provide a valid address", Toast.LENGTH_SHORT);
                     toast.show();
-                    return;
+                } else {
+                    System.out.println("lat: " + array[0] + ", lon: " + array[1]);
+                    lat = array[0];
+                    lon = array[1];
+
+                    //default radius is 1000 meters
+                    if (radiusText.getText().toString().equals("")) {
+                        radius = 1000;
+                    } else {
+                        radius = Integer.valueOf(radiusText.getText().toString());
+                    }
+                    System.out.println(array[0] + " :lat  +  lon: " + array[1] + "  radius:  " + radius);
+                    System.out.println(alertText.getText().toString());
+                    createAlert(alertText.getText().toString(), lat, lon);
+                    geofenceObjects.add(new GeofenceObjects(address.getText().toString(), alertText.getText().toString(), radius));
+                    saveToStorage();
+                    finish();
                 }
-                lat = array[0];
-                lon = array[1];
-                radius = Integer.valueOf(radiusText.getText().toString());
-                System.out.println(array[0] + " :lat  +  lon: " + array[1] + "  radius:  " + radius);
-                System.out.println(alertText.getText().toString());
-                createAlert(alertText.getText().toString(), lat, lon);
-                geofenceObjects.add(new GeofenceObjects(address.getText().toString(), alertText.getText().toString(), radius));
-                saveToStorage();
-                finish();
             }
         });
+    }
+
+    public void setupGoogle() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
     }
 
     public void readEarlierGeofences() {
@@ -139,6 +149,7 @@ public class NewGeofence extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
+        System.out.println("google connected****************'");
     }
 
     @Override
@@ -235,14 +246,19 @@ public class NewGeofence extends AppCompatActivity
         }
     }
 
-    public double[] fetchLocationName(String locationName) throws Exception {
+    public double[] fetchLocationName(String locationName) {
         // geoCoder object with a context argument
         //context is used to access global application or activity information
         Geocoder geoCoder = new Geocoder(context, Locale.getDefault());
         double latitude = 0;
         double longitude = 0;
-        List<Address> address = geoCoder.getFromLocationName(locationName, 1);
-        if (address.isEmpty()) throw new Exception("Address is wrong");
+        List<Address> address = new ArrayList<>();
+        try {
+            address = geoCoder.getFromLocationName(locationName, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (address.isEmpty()) return new double[] {latitude, longitude};
         latitude = address.get(0).getLatitude();
         longitude = address.get(0).getLongitude();
         return new double[] {latitude, longitude};

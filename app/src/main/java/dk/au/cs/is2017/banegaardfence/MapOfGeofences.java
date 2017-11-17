@@ -71,7 +71,7 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latlon[0], latlon[1]))
                     .title(geofenceObjects.getGeofenceName())
-                    .snippet("Radius: " + radius + "m")).showInfoWindow();
+                    .snippet("Radius: " + radius + "m"));
             //Instantiates a new CircleOptions object +  center/radius
             CircleOptions circleOptions = new CircleOptions()
                     .center(new LatLng(latlon[0], latlon[1]))
@@ -117,7 +117,7 @@ public class MapOfGeofences extends FragmentActivity implements OnMapReadyCallba
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         addMarkerForFence();
+        mMap.moveCamera( CameraUpdateFactory.newLatLngZoom(new LatLng(xxxx,xxxx) , 14.0f) );
     }
 }
